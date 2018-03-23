@@ -1,10 +1,11 @@
 #include <iostream>
+#include <string>
 
 #include "image_ppm.h"
 
 using namespace std;
 
-void bubbleSort(int* array, unsigned int size) {
+void bubbleSort(int* array, string* name, unsigned int size) {
 	int swapped = 0;
 
 	do {
@@ -13,6 +14,7 @@ void bubbleSort(int* array, unsigned int size) {
 		for(unsigned int i = 0; i < size - 1; i++) {
 			if(array[i] > array[i+1]) {
 				swap(array[i], array[i+1]);
+				swap(string[i], string[i+1]);
 				swapped = 1;
 			}
 		}
@@ -24,5 +26,42 @@ int main(int argc, char const *argv[]) {
         cout << "Usage: " << argv[0] << "<imageIn.pgm>" << endl;
         return 1;
     }
-    return 0;
+
+	// *********************
+	// * RECUPERATION DATA *
+	// *********************
+
+	//TODO
+
+	// ***********
+	// * MOYENNE *
+	// ***********
+
+	//TODO
+
+	// ************
+	// * TRI DATA *
+	// ************
+
+	//TODO
+
+	// **********************
+	// * RECUPERATION IMAGE *
+	// **********************
+
+	//TODO
+
+	// *******************************
+	// * DECOUPAGE EN BLOC + MOYENNE *
+	// *******************************
+
+	//TODO
+
+	// *******************************
+	// * RECHERCHE PLUS PROCHE IMAGE *
+	// *******************************
+
+	//TODO
+
+	return 0;
 }
