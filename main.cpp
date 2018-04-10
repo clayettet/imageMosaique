@@ -2,7 +2,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <string>
 
 #include "image_ppm.h"
 
@@ -47,18 +47,19 @@ int main(int argc, char const *argv[]) {
  	allocation_tableau(img, OCTET, taille);
 
 	int moyenne; // moyenne de l'image en cours
+	string imageName;
 
 	for(int i = 0; i<10000 ; i++){
 		images[i]=i; //tableau de nom
 		moyenne = 0;
-  		lire_image_pgm((char*)("data/" + to_string(i) + ".pgm"), img, taille);
+		imageName = "data/"+i+".pgm";
+  		lire_image_pgm(imageName.c_str(), img, taille);
 		for(int j = 0; j<cote ; j++){
 			for(int h = 0; h<cote; h++){
-				printf("%i\n", h);
 				moyenne += img[i*cote+h]; //ajout du pixel courant dans calcul moyenne
 			}
 		}
-		moyennes[i] = moyenne/taille; //calcul moyenne finale dans tab
+		//moyennes[i] = moyenne/taille; //calcul moyenne finale dans tab
 	}
 
 
