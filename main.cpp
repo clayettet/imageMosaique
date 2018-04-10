@@ -11,21 +11,43 @@
 
 using namespace std;
 
-void bubbleSort(int* array, string* name, unsigned int size) {
-	int swapped = 0;
 
-	do {
-		swapped = 0;
-
-		for(unsigned int i = 0; i < size - 1; i++) {
-			if(array[i] > array[i+1]) {
-				swap(array[i], array[i+1]);
-				swap(name[i], name[i+1]);
-				swapped = 1;
-			}
-		}
-	} while(swapped);
+//utilisé dans quicksort()
+void echanger(int tableau[], int a, int b){
+    int temp = tableau[a];
+    tableau[a] = tableau[b];
+    tableau[b] = temp;
 }
+
+
+//tri rapide (meilleur que bubble)
+void quickSort(int tableau[], int debut, int fin){
+    int gauche = debut-1;
+    int droite = fin+1;
+    const int pivot = tableau[debut];
+
+    /* Si le tableau est de longueur nulle, il n'y a rien à faire. */
+    if(debut >= fin)
+        return;
+
+    /* Sinon, on parcourt le tableau, une fois de droite à gauche, et une
+       autre de gauche à droite, à la recherche d'éléments mal placés,
+       que l'on permute. Si les deux parcours se croisent, on arrête. */
+    while(1){
+        do droite--; while(tableau[droite] > pivot);
+        do gauche++; while(tableau[gauche] < pivot);
+
+        if(gauche < droite)
+            echanger(tableau, gauche, droite);
+        else break;
+    }
+
+    /* Maintenant, tous les éléments inférieurs au pivot sont avant ceux
+       supérieurs au pivot. On a donc deux groupes de cases à trier. On réappelle QuickSort*/
+    quickSort(tableau, debut, droite);
+    quickSort(tableau, droite+1, fin);
+}
+
 
 int main(int argc, char const *argv[]) {
     if(argc != 2) {
@@ -68,6 +90,10 @@ int main(int argc, char const *argv[]) {
 	// ************
 	// * TRI DATA *
 	// ************
+
+	//TODO appeler les deux tableaux en parametre et modifier les deux en meme temps selon moyenne[]
+	quickSort(images, 0, 10000);
+
 
 	//TODO
 
