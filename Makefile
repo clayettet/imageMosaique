@@ -1,5 +1,5 @@
-all: main.cpp
-	g++ main.cpp -Wall -Wextra -g -std=c++11
+a.out: main.cpp
+	g++ $^ -o $@ -Wall -Wextra -g -std=c++11
 
 run:
 	./a.out $(filter-out $@,$(MAKECMDGOALS))

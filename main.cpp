@@ -3,11 +3,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
+#include <dirent.h>
+#include <time.h>
 
 #include "image_ppm.h"
 
-#define cote 512
-#define taille cote*cote
+int COTE = 512;
+int TAILLE = COTE*COTE;
 
 using namespace std;
 
@@ -51,48 +53,74 @@ void quickSort(int tableau[], int debut, int fin){
 
 int main(int argc, char const *argv[]) {
     if(argc != 2) {
-        cout << "Usage: " << argv[0] << "<imageIn.pgm>" << endl;
+        cout << "Usage: " << argv[0] << " <imageIn.pgm>" << endl;
         return 1;
     }
+
+    clock_t t1, t2;
 
 	// *********************
 	// * RECUPERATION NOMS + MOYENNES *
 	// *********************
 
-	//TODO
-	//creation tableau pour nom des images
-	int* images = new int[10000];
-	//creation tableau pour moyenne des images
-	int* moyennes = new int[10000];
-	//tableau de lecture image
-	OCTET* img;
- 	allocation_tableau(img, OCTET, taille);
+	char** images = new char*[10000]; // tableau pour nom des images
+    for(int i = 0; i < 10000; i++) {
+        images[i] = new char[16];
+    }
+	int* moyennes = new int[10000]; // tableau pour moyenne des images
 
-	int moyenne; // moyenne de l'image en cours
-	string imageName;
+	OCTET* img; // image courante
+ 	allocation_tableau(img, OCTET, TAILLE);
+    int moyenne; // moyenne de l'image courante
 
-	for(int i = 0; i<10000 ; i++){
-		images[i]=i; //tableau de nom
-		moyenne = 0;
-		imageName = "data/"+i+".pgm";
-  		lire_image_pgm(imageName.c_str(), img, taille);
-		for(int j = 0; j<cote ; j++){
-			for(int h = 0; h<cote; h++){
-				moyenne += img[i*cote+h]; //ajout du pixel courant dans calcul moyenne
-			}
-		}
-		//moyennes[i] = moyenne/taille; //calcul moyenne finale dans tab
-	}
+    DIR* rep = NULL; // répertoire d'image de reference
+    if((rep = opendir("./data")) == NULL) {
+        exit(1);
+    }
+    struct dirent* ent; // structure "fichier"
+    int i = 0;
+    t1 = clock();
+    while((ent = readdir(rep)) != NULL) { // stockage des noms dans le tableau "images"
+        if(strcmp(ent->d_name, ".") != 0 && strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, "Licence.txt") != 0 && strcmp(ent->d_name, ".DS_Store") != 0) {
+            string str = "data/" + (string)ent->d_name;
+            copy(str.begin(), str.end(), images[i]);
+            i++;
+        }
+    }
+    t2 = clock();
+    cout << (float)(t2-t1)/CLOCKS_PER_SEC << endl;
 
+    cout << images[2] << endl;
 
-	//TODO
+    if(closedir(rep) == -1) { // fermeture de l'objet repertoire
+        exit(-1);
+    };
+
+    t1 = clock();
+    for(int k = 0; k < 10000; k++) {
+        lire_image_pgm(images[k], img, TAILLE);
+
+        moyenne = 0;
+        for(int i = 0; i < COTE; i++) {
+            for(int j = 0; j < COTE; j++) {
+                moyenne += img[i*COTE+j];
+            }
+        }
+        moyennes[k] = moyenne / TAILLE;
+    }
+    t2 = clock();
+    cout << (float)(t2-t1)/CLOCKS_PER_SEC << endl;
+
+    for(int i = 0; i < 10000; i++) {
+        cout << moyennes[i] << endl;
+    }
 
 	// ************
 	// * TRI DATA *
 	// ************
 
 	//TODO appeler les deux tableaux en parametre et modifier les deux en meme temps selon moyenne[]
-	quickSort(images, 0, 10000);
+	// quickSort(images, 0, 10000);
 
 
 	//TODO
@@ -115,7 +143,9 @@ int main(int argc, char const *argv[]) {
 
 	//TODO
 
+    delete img;
 	delete[] images;
 	delete[] moyennes;
+
 	return 0;
 }
