@@ -1,8 +1,7 @@
-a.out: main.cpp
-	g++ $^ -o $@ -Wall -Wextra -g -std=c++11
+all: main.out
 
-run:
-	./a.out $(filter-out $@,$(MAKECMDGOALS))
+main.out: main.cpp
+	g++ $^ -o $@ -Wall -Wextra -g -std=c++11
 
 clean:
 	rm -f *.o

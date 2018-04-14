@@ -36,46 +36,52 @@ void selection_sort(int* array, char** array2, unsigned int size) {
     }
 }
 
-// //utilisé dans quicksort()
-// void echanger(int tableau[], int a, int b){
-//     int temp = tableau[a];
-//     tableau[a] = tableau[b];
-//     tableau[b] = temp;
-// }
-//
-//
-// //tri rapide (meilleur que bubble)
-// void quickSort(int tableau[], int debut, int fin){
-//     int gauche = debut-1;
-//     int droite = fin+1;
-//     const int pivot = tableau[debut];
-//
-//     /* Si le tableau est de longueur nulle, il n'y a rien à faire. */
-//     if(debut >= fin)
-//         return;
-//
-//     /* Sinon, on parcourt le tableau, une fois de droite à gauche, et une
-//        autre de gauche à droite, à la recherche d'éléments mal placés,
-//        que l'on permute. Si les deux parcours se croisent, on arrête. */
-//     while(1){
-//         do droite--; while(tableau[droite] > pivot);
-//         do gauche++; while(tableau[gauche] < pivot);
-//
-//         if(gauche < droite)
-//             echanger(tableau, gauche, droite);
-//         else break;
-//     }
-//
-//     /* Maintenant, tous les éléments inférieurs au pivot sont avant ceux
-//        supérieurs au pivot. On a donc deux groupes de cases à trier. On réappelle QuickSort*/
-//     quickSort(tableau, debut, droite);
-//     quickSort(tableau, droite+1, fin);
-// }
+int recherche(int* moyennes, int size, int moyenne) {
+    for(int i = 0; i < size; i++) {
+        if(moyennes[i] == moyenne) {
+            return i;
+        } else if(moyennes[i] > moyenne && i > 0) {
+            if(abs(moyennes[i]-moyenne) <= abs(moyennes[i-1]-moyenne)) {
+                return i;
+            } else {
+                return i-1;
+            }
+        }
+    }
 
+    return 0;
+}
+
+int dichotomie(int* moyennes, int debut, int fin, int moyenne) {
+    cout << "moyenne : " << moyenne << ", moyennes[" << fin-((fin-debut)/2) << "] : " << moyennes[fin-((fin-debut)/2)] << ", debut : " << debut << ", fin : " << fin << endl;
+    if(fin - debut == 1) {
+        if(abs(moyennes[fin]-moyenne) <= abs(moyennes[debut]-moyenne)) {
+            return fin;
+        } else {
+            return debut;
+        }
+    } else if(moyennes[fin-((fin-debut)/2)] == moyenne) {
+        return fin-((fin-debut)/2);
+    } else if(moyennes[fin-((fin-debut)/2)] >= moyenne) {
+        return dichotomie(moyennes, debut, fin-((fin-debut)/2), moyenne);
+    } else {
+        return dichotomie(moyennes, fin-((fin-debut)/2), fin, moyenne);
+    }
+}
+
+int psnr() {
+    return 0;
+}
 
 int main(int argc, char const *argv[]) {
     if(argc != 4) {
         cout << "Usage: " << argv[0] << " <imageIn.pgm> <imageOut.pgm> <nbBlocLargeur>" << endl;
+        return 1;
+    }
+
+    int nbBlocLargeur = atoi(argv[3]);
+    if(COTE % nbBlocLargeur != 0) {
+        cout << "Nombre de bloc incorrect" << endl;
         return 1;
     }
 
@@ -85,7 +91,6 @@ int main(int argc, char const *argv[]) {
 
     clock_t t1, t2;
 
-    int nbBlocLargeur = atoi(argv[3]);
     int largeurBloc = COTE / nbBlocLargeur;
     int tailleBloc = largeurBloc * largeurBloc;
     int nbBloc = nbBlocLargeur * nbBlocLargeur;
@@ -99,10 +104,11 @@ int main(int argc, char const *argv[]) {
 	int* moyennes = new int[10000]; // tableau pour moyenne des images
 
 	OCTET* img; // image courante
-	OCTET* tmp; // image courante
+	OCTET* tmp; // image temporaire
  	allocation_tableau(img, OCTET, TAILLE);
  	allocation_tableau(tmp, OCTET, TAILLE);
     int moyenne; // moyenne de l'image courante
+    int indiceRef; // indice de reference dans le tableau d'images
 
     DIR* rep = NULL; // répertoire d'image de reference
 
@@ -162,36 +168,40 @@ int main(int argc, char const *argv[]) {
 
 	lire_image_pgm((char*)argv[1], img, TAILLE);
 
-	// *******************************
-	// * DECOUPAGE EN BLOC + MOYENNE *
-	// *******************************
+	// ******************************************
+	// * DECOUPAGE EN BLOC + MOYENNE + MOSAIQUE *
+	// ******************************************
 
 	for(int k = 0; k < nbBloc; k++) {
-        premierIndiceBloc = 0;
+        premierIndiceBloc = ((k - (k % nbBlocLargeur)) * tailleBloc) + ((k % nbBlocLargeur) * largeurBloc);
         moyenne = 0;
 
         for(int i = 0; i < largeurBloc; i++) {
             for(int j = 0; j < largeurBloc; j++) {
-                indiceBloc = 0;
+                indiceBloc = premierIndiceBloc + (i*COTE) + j;
                 moyenne += img[indiceBloc];
             }
         }
 
         moyenne /= tailleBloc;
+        indiceRef = recherche(moyennes, 10000, img[premierIndiceBloc]);
+        // indiceRef = dichotomie(moyennes, 0, 9999, moyenne);
 
-        for(int i = 0; i < tailleBloc; i++) {
-            for(int j = 0; j < tailleBloc; j++) {
-                indiceBloc = 0;
-                tmp[i] = moyenne;
+        lire_image_pgm(images[indiceRef], tmp, TAILLE);
+
+        for(int i = 0; i < largeurBloc; i++) {
+            for(int j = 0; j < largeurBloc; j++) {
+                indiceBloc = premierIndiceBloc + (i*COTE) + j;
+                img[indiceBloc] = tmp[(i*(COTE/largeurBloc))*COTE+(j*(COTE/largeurBloc))];
             }
         }
     }
 
-	// *******************************
-	// * RECHERCHE PLUS PROCHE IMAGE *
-	// *******************************
+    ecrire_image_pgm((char*)argv[2], img, COTE, COTE);
 
-	//TODO
+    // ********************
+	// * FIN DU PROGRAMME *
+	// ********************
 
     delete img;
     delete tmp;
