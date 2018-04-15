@@ -52,27 +52,6 @@ int recherche(int* moyennes, int size, int moyenne) {
     return 0;
 }
 
-int dichotomie(int* moyennes, int debut, int fin, int moyenne) {
-    cout << "moyenne : " << moyenne << ", moyennes[" << fin-((fin-debut)/2) << "] : " << moyennes[fin-((fin-debut)/2)] << ", debut : " << debut << ", fin : " << fin << endl;
-    if(fin - debut == 1) {
-        if(abs(moyennes[fin]-moyenne) <= abs(moyennes[debut]-moyenne)) {
-            return fin;
-        } else {
-            return debut;
-        }
-    } else if(moyennes[fin-((fin-debut)/2)] == moyenne) {
-        return fin-((fin-debut)/2);
-    } else if(moyennes[fin-((fin-debut)/2)] >= moyenne) {
-        return dichotomie(moyennes, debut, fin-((fin-debut)/2), moyenne);
-    } else {
-        return dichotomie(moyennes, fin-((fin-debut)/2), fin, moyenne);
-    }
-}
-
-int psnr() {
-    return 0;
-}
-
 int main(int argc, char const *argv[]) {
     if(argc != 4) {
         cout << "Usage: " << argv[0] << " <imageIn.pgm> <imageOut.pgm> <nbBlocLargeur>" << endl;
@@ -172,6 +151,7 @@ int main(int argc, char const *argv[]) {
 	// * DECOUPAGE EN BLOC + MOYENNE + MOSAIQUE *
 	// ******************************************
 
+    t1 = clock();
 	for(int k = 0; k < nbBloc; k++) {
         premierIndiceBloc = ((k - (k % nbBlocLargeur)) * tailleBloc) + ((k % nbBlocLargeur) * largeurBloc);
         moyenne = 0;
@@ -185,7 +165,6 @@ int main(int argc, char const *argv[]) {
 
         moyenne /= tailleBloc;
         indiceRef = recherche(moyennes, 10000, img[premierIndiceBloc]);
-        // indiceRef = dichotomie(moyennes, 0, 9999, moyenne);
 
         lire_image_pgm(images[indiceRef], tmp, TAILLE);
 
@@ -196,6 +175,8 @@ int main(int argc, char const *argv[]) {
             }
         }
     }
+    t2 = clock();
+    cout << "time to mosaique : " << (float)(t2-t1)/CLOCKS_PER_SEC << endl;
 
     ecrire_image_pgm((char*)argv[2], img, COTE, COTE);
 
