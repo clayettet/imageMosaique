@@ -1,18 +1,21 @@
-all: ai_rr.out ai_rd.out ad_rr.out ad_rd.out psnr.out
+all: int_firstup.out int_dicho.out double_firstup.out double_dicho.out psnr.out analyse.out
 
-ai_rr.out: ai_rr.cpp
+int_firstup.out: int_firstup.cpp
 	g++ $^ -o $@ -Wall -Wextra -g -std=c++11
 
-ai_rd.out: ai_rd.cpp
+int_dicho.out: int_dicho.cpp
 	g++ $^ -o $@ -Wall -Wextra -g -std=c++11
 
-ad_rr.out: ad_rr.cpp
+double_firstup.out: double_firstup.cpp
 	g++ $^ -o $@ -Wall -Wextra -g -std=c++11
 
-ad_rd.out: ad_rd.cpp
+double_dicho.out: double_dicho.cpp
 	g++ $^ -o $@ -Wall -Wextra -g -std=c++11
 
 psnr.out: psnr.cpp
+	g++ $^ -o $@ -Wall -Wextra -g -std=c++11
+
+analyse.out: analyse.cpp
 	g++ $^ -o $@ -Wall -Wextra -g -std=c++11
 
 clean:
