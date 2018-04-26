@@ -1,0 +1,9 @@
+4 fichiers sources
+
+ai -> moyenne entière
+ad -> moyenne flottante
+rr -> recherche de la premiere moyenne supérieur (ou plus proche)
+rd -> recherche dichotomique
+
+globalement c'est tout
+après y a les psnr correspondants
